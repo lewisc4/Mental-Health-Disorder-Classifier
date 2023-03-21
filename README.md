@@ -9,10 +9,10 @@ It is necessary to have python >= 3.7 installed in order to run the code for thi
 
 1. Clone or download this project to your local computer.
 2. Navigate to the [root directory](https://github.com/lewisc4/Mental-Health-Disorder-Classifier), where the [`setup.py`](/setup.py) file is located.
-3. Install the [`mhd_classifier`](/mhd_classifier) module and all dependencies by running the following command: `pip install -e .` (required python modules are in [`requirements.txt`](/requirements.txt)).
+3. Install the [`mhd_classifier`](/mhd_classifier) module and all dependencies by running the command: `pip install -e .` (required python modules are in [`requirements.txt`](/requirements.txt)).
 
 ### Downloading The Dataset
-The dataset is stored in [`data.zip`](/cli/data.zip), located in this GitHub repository. Once this project has been cloned or downloaded to your local computer, unzip [`data.zip`](/cli/data.zip). This project assumes **and requires** that it will be unzipped in its original directory ([`cli/`](/cli)), where all scripts run from the CLI located. Once unzipped, [`data.zip`](/cli/data.zip) can be deleted.
+The dataset is stored in [`data.zip`](/cli/data.zip), located in this GitHub repository. Once this project has been cloned or downloaded to your local computer, unzip [`data.zip`](/cli/data.zip). This project assumes **and requires** that it will be unzipped in its original directory ([`cli/`](/cli)), containing all CLI scripts. Once unzipped, [`data.zip`](/cli/data.zip) can be deleted.
 
 Unzipping [`data.zip`](/cli/data.zip) will reveal the following file structure:
 
