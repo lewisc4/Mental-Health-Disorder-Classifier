@@ -24,8 +24,8 @@ data
 │ 
 └── keywords # Contains pattern-building data for identifying self-diagnosed users
     ├── patterns # Contains files to build self-diagnosis pattern bases and variations
-    │   ├── common_prefixes.txt # Common words (e.g. my, the, a) to create sentence variations
-    │   └── diagnosis_patterns.txt # Generic self-diagnosis patterns (e.g. "I was diagnosed with __")
+    │   ├── common_prefixes.txt # Common words (my, the, a, etc.) to create sentence variations
+    │   └── diagnosis_patterns.txt # Generic self-diagnosis patterns (e.g., "I was diagnosed with __")
     │
     └── synonyms # Contains files with diagnosis-related synonyms, to inject in base patterns
         ├── adhd.txt # Synonyms for ADHD (ADD, attention deficit hyperactivity, etc.)
@@ -35,6 +35,39 @@ data
         ├── eating_disorders.txt # Synonyms for eating disorders (anorexia, bulimia, etc.)
         └── ocd.txt # Synonyms for OCD (obsessive compulsive disorder, anankastic neurosis, etc.)
 ```
+
+## Preprocessing
+[preprocess.py](/cli/preprocess.py) is used to process the data for training (cleaning, feature generation, identifying self-diagnoses, etc.)
+
+### Arguments
+In addition to the arguments in [cli_utils.py](/mhd_classifier/utils/cli_utils.py), there are also preprocessing-specific arguments in [preprocess.py](/cli/preprocess.py).
+
+### Example Usage
+**To preprocess using the default arguments:**
+- `python3 preprocess.py`
+
+
+## Training
+The [train.py](/cli/train.py) script is used to train a model using the preprocessed dataset.
+
+### Arguments/Model Hyperparameters
+In addition to the arguments in [cli_utils.py](/mhd_classifier/utils/cli_utils.py), there are also training-specific arguments in [train.py](/cli/train.py).
+
+### Example Usage
+**To train using the default arguments/model hyperparameters:**
+- `python3 train.py`
+
+
+## Evaluation
+The [evaluate.py](/cli/evaluate.py) script is used to generate evaluation metrics using model predictions.
+
+### Arguments
+In addition to the arguments in [cli_utils.py](/mhd_classifier/utils/cli_utils.py), there are also evaluation-specific arguments in [evaluate.py](/cli/evaluate.py).
+
+### Example Usage
+**To get evaluation metrics using the default arguments:**
+- `python3 evaluate.py`
+
 
 <!--
 ## Training
