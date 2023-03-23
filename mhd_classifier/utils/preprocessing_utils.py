@@ -43,7 +43,7 @@ class Preprocessor:
 		return ' '.join(valid.split())
 
 
-	def embed(self, df, field, embedding_type):
+	def embed(self, embedding_type, df, field='text'):
 		''' Given a Pandas DF and one of its columns, embed that data '''
 		embedding_model = SentenceTransformer(embedding_type)
 		text = df[field].tolist()
@@ -51,7 +51,7 @@ class Preprocessor:
 		return np.array(embeddings)
 
 
-	def remove_stopwords(self, df, field, custom_stopwords=None):
+	def remove_stopwords(self, df, field='text', custom_stopwords=None):
 		''' Removes stop words from Pandas DF column'''
 		if custom_stopwords is not None:
 			self.stopwords += custom_stopwords
