@@ -8,17 +8,24 @@ from tensorflow.keras import layers, optimizers, losses, Model
 
 
 class GraphMLModel(ABC):
+	''' Abstract base class to represent a graph machine learning model. '''
 
-	def __init__(self, graph, train_data, val_data, test_data, args, trained_model):
+	def __init__(self, graph, dataset, args, trained_model):
+		''' Requires a StellarGraph graph and corresponding train/val/test nodes. '''
 		self.graph = graph
-		self.train_data = train_data
-		self.val_data = val_data
-		self.test_data = test_data
+		self.dataset = dataset
 		self.args = args
 		self.trained_model = trained_model
 
+		# Get train/val/test data from our dataset
+		self.train_data = self.dataset.get('train', None)
+		self.val_data = self.dataset.get('val', self.train_data)
+		self.test_data = self.dataset.get('test', self.val_data)
+
+		# Init generator and graph model layer used by child classes
 		self.init_generator()
 		self.init_graph_model()
+		# Init our train/val model targets and train/val/test nodes
 		self.init_targets()
 		self.init_nodes()
 
@@ -35,6 +42,7 @@ class GraphMLModel(ABC):
 
 
 	def init_targets(self):
+		''' Initializes train/val model targets based on class labels. '''
 		train_labels = self.train_data.labels.values
 		val_labels = self.val_data.labels.values
 		self.target_encoding = preprocessing.LabelBinarizer()
@@ -43,6 +51,7 @@ class GraphMLModel(ABC):
 
 
 	def init_nodes(self):
+		''' Initializes train/val/test nodes so they can be traversed. '''
 		if self.shuffleable_generator:
 			self.train_nodes = self.generator.flow(
 				self.train_data.index,
@@ -64,7 +73,8 @@ class GraphMLModel(ABC):
 		)
 
 
-	def train(self, save=True, class_weight=None):
+	def train(self):
+		''' Train a model and save it if specified (class weights not used). '''
 		x_in, x_out = self.graph_model.in_out_tensors()
 		pred_layer = layers.Dense(
 			units=self.train_targets.shape[1],
@@ -84,21 +94,20 @@ class GraphMLModel(ABC):
 			verbose=2,
 			shuffle=self.args.shuffle_train_data,
 		)
-		if save:
-			model.save(self.args.model_dir / self.args.model_location)
-
 		self.trained_model = model
 		return model
 
 
-	def test(self):
-		if self.trained_model is None:
+	def test(self, model_to_use=None):
+		''' Get test set predictions using a trained model. '''
+		testing_model = model_to_use or self.trained_model
+		if testing_model is None:
 			return
 
 		test_ids = self.test_data.index
 		test_labels = self.test_data.labels
 
-		embeddings = self.trained_model.predict(self.test_nodes, verbose=1)
+		embeddings = testing_model.predict(self.test_nodes, verbose=1)
 		embeddings = embeddings.squeeze()
 
 		predicted_labels = self.target_encoding.inverse_transform(embeddings)
@@ -113,14 +122,16 @@ class GraphMLModel(ABC):
 
 
 class GraphSAGEModel(GraphMLModel):
+	''' GraphSAGE model class. '''
 
-	def __init__(self, graph, train_data, val_data, test_data, args, trained_model=None):
+	def __init__(self, graph, dataset, args, trained_model=None):
 		# Special case, always shuffle train data (in generator) for GraphSAGE
 		args.shuffle_generator = True
-		super().__init__(graph, train_data, val_data, test_data, args, trained_model)
+		super().__init__(graph, dataset, args, trained_model)
 
 
 	def init_generator(self):
+		''' GraphSAGE node generation/traversal method. '''
 		self.generator = GraphSAGENodeGenerator(
 			G=self.graph,
 			batch_size=self.args.batch_size,
@@ -129,8 +140,8 @@ class GraphSAGEModel(GraphMLModel):
 		self.shuffleable_generator = True
 
 
-
 	def init_graph_model(self):
+		''' Initializes GraphSAGE model with hyperparameters. '''
 		self.graph_model = GraphSAGE(
 			layer_sizes=[self.args.layer_size] * self.args.num_layers,
 			generator=self.generator,
@@ -140,18 +151,20 @@ class GraphSAGEModel(GraphMLModel):
 
 
 class GCNModel(GraphMLModel):
+	''' GCN (Graph Convolutional Network) model class. '''
 
-	def __init__(self, graph, train_data, val_data, test_data, args, trained_model=None):
-		super().__init__(graph, train_data, val_data, test_data, args, trained_model)
+	def __init__(self, graph, dataset, args, trained_model=None):
+		super().__init__(graph, dataset, args, trained_model)
 
 
 	def init_generator(self):
+		''' GCN node generation/traversal method. '''
 		self.generator = FullBatchNodeGenerator(G=self.graph, method='gcn')
 		self.shuffleable_generator = False
 
 
-
 	def init_graph_model(self):
+		''' Initializes GCN model with hyperparameters. '''
 		self.graph_model = GCN(
 			layer_sizes=[self.args.layer_size] * self.args.num_layers,
 			generator=self.generator,
@@ -161,18 +174,21 @@ class GCNModel(GraphMLModel):
 
 
 class GATModel(GraphMLModel):
+	''' GAT (Graph Attention Network) model class. '''
 
-	def __init__(self, graph, train_data, val_data, test_data, args, trained_model=None):
-		super().__init__(graph, train_data, val_data, test_data, args, trained_model)
+	def __init__(self, graph, dataset, args, trained_model=None):
+		super().__init__(graph, dataset, args, trained_model)
 
 
 	def init_generator(self):
+		''' GAT node generation/traversal method. '''
 		self.generator = FullBatchNodeGenerator(G=self.graph, method='gat')
 		self.shuffleable_generator = False
 
 
 
 	def init_graph_model(self):
+		''' Initializes GAT model with hyperparameters. '''
 		self.graph_model = GAT(
 			layer_sizes=[self.args.layer_size] * self.args.num_layers,
 			generator=self.generator,
