@@ -37,36 +37,51 @@ data
 ```
 
 ## Preprocessing
-[preprocess.py](/cli/preprocess.py) is used to process the data for training (cleaning, feature generation, identifying self-diagnoses, etc.)
+[preprocess.py](/cli/preprocess.py) is used to process the data for training (cleaning, feature generation, etc.)
 
 ### Arguments
-In addition to the arguments in [cli_utils.py](/mhd_classifier/utils/cli_utils.py), there are also preprocessing-specific arguments in [preprocess.py](/cli/preprocess.py).
+In addition to the [standard arguments](/mhd_classifier/utils/cli_utils.py#L25) in [cli_utils.py](/mhd_classifier/utils/cli_utils.py), there are also [preprocessing-specific arguments](/mhd_classifier/utils/cli_utils.py#L126) in [cli_utils.py](/mhd_classifier/utils/cli_utils.py)
 
 ### Example Usage
 **To preprocess using the default arguments:**
 - `python3 preprocess.py`
+
+**To preprocess using a specified embedding model for features:**
+- `python3 preprocess.py --embedding_model=average_word_embeddings_glove.840B.300d`
 
 
 ## Training
 The [train.py](/cli/train.py) script is used to train a model using the preprocessed dataset.
 
 ### Arguments/Model Hyperparameters
-In addition to the arguments in [cli_utils.py](/mhd_classifier/utils/cli_utils.py), there are also training-specific arguments in [train.py](/cli/train.py).
+In addition to the [standard arguments](/mhd_classifier/utils/cli_utils.py#L25) in [cli_utils.py](/mhd_classifier/utils/cli_utils.py), there are also [training-specific arguments](/mhd_classifier/utils/cli_utils.py#L158) in [cli_utils.py](/mhd_classifier/utils/cli_utils.py)
 
 ### Example Usage
 **To train using the default arguments/model hyperparameters:**
 - `python3 train.py`
+
+**To train a GraphSAGE model with good performance:**
+- `python3 train.py --model_type=GraphSAGE --learning_rate=3e-2 --num_train_epochs=5 --batch_size=300 --layer_size=32`
+
+**To train a GCN model with good performance:**
+- `python3 train.py --model_type=GCN --learning_rate=2e-2 --num_train_epochs=60 --batch_size=300 --layer_size=32`
+
+**To train a GAT model with good performance:**
+- `python3 train.py --model_type=GAT --learning_rate=5e-2 --num_train_epochs=60 --batch_size=300 --num_layers=1 --layer_size=32 --hidden_activation=elu`
 
 
 ## Evaluation
 The [evaluate.py](/cli/evaluate.py) script is used to generate evaluation metrics using model predictions.
 
 ### Arguments
-In addition to the arguments in [cli_utils.py](/mhd_classifier/utils/cli_utils.py), there are also evaluation-specific arguments in [evaluate.py](/cli/evaluate.py).
+In addition to the [standard arguments](/mhd_classifier/utils/cli_utils.py#L25) in [cli_utils.py](/mhd_classifier/utils/cli_utils.py), there are also [evaluation-specific arguments](/mhd_classifier/utils/cli_utils.py#L312) in [cli_utils.py](/mhd_classifier/utils/cli_utils.py).
 
 ### Example Usage
 **To get evaluation metrics using the default arguments:**
 - `python3 evaluate.py`
+
+**To get specific evaluation metrics and save them with the prefix "GCN":**
+- `python3 evaluate.py --metrics=scores,confusion_matrix --save_prefix=GCN`
 
 
 <!--
